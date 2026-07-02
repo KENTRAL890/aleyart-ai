@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import type { ExamPaper, Question, SubQuestion } from '../types';
+import { MATH_SHAPE_OPTIONS, NACCA_DIAGRAMS } from '../data/constants';
+import MathFormattedText from './MathFormattedText';
+import CustomShapeBuilderModal, { CustomShapeResult } from './CustomShapeBuilderModal';
 
 interface Props {
   exam: ExamPaper;
@@ -14,6 +17,7 @@ export default function ExamPreview({ exam, onUpdate }: Props) {
   const [editSubQuestions, setEditSubQuestions] = useState<SubQuestion[]>([]);
   const [editMarks, setEditMarks] = useState(0);
   const [editImageUrl, setEditImageUrl] = useState('');
+  const [showShapeModal, setShowShapeModal] = useState(false);
 
   const isBasic1to3 = ['Basic 1', 'Basic 2', 'Basic 3'].includes(exam.classLevel);
   const isBasic1to9 = !['Creche', 'N1', 'N2', 'KG1', 'KG2'].includes(exam.classLevel);
@@ -56,6 +60,7 @@ export default function ExamPreview({ exam, onUpdate }: Props) {
           question: q.question,
           correctAnswer: q.correctAnswer,
           marks: q.marks,
+          imageUrl: q.imageUrl,
           subAnswers: q.subQuestions?.map(sq => ({
             label: sq.label,
             answer: sq.answer,
@@ -145,6 +150,47 @@ export default function ExamPreview({ exam, onUpdate }: Props) {
           <input type="number" value={editMarks} onChange={e => setEditMarks(parseInt(e.target.value) || 1)} className="w-16 px-2 py-1 border rounded text-sm" />
         </div>
       </div>
+      <div className="mb-3">
+        <label className="text-xs font-medium text-gray-500 block mb-1">Insert Diagram / Shape / Webpage Image URL:</label>
+        <div className="flex gap-2 mb-1">
+          <input
+            type="text"
+            value={editImageUrl}
+            onChange={e => setEditImageUrl(e.target.value)}
+            placeholder="Paste any image URL from a webpage..."
+            className="flex-1 px-2 py-1 border rounded text-xs"
+          />
+          <button
+            type="button"
+            onClick={() => setShowShapeModal(true)}
+            className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold whitespace-nowrap"
+          >
+            📐 Custom Shape...
+          </button>
+        </div>
+        <select
+          value={editImageUrl}
+          onChange={e => setEditImageUrl(e.target.value)}
+          className="w-full px-2 py-1 border rounded text-xs bg-white"
+        >
+          <option value="">— Or pick from NaCCA Diagram Library —</option>
+          <optgroup label="Mathematics Shapes">
+            {MATH_SHAPE_OPTIONS.map((shape, i) => (
+              <option key={i} value={shape.url}>📐 {shape.label}</option>
+            ))}
+          </optgroup>
+          {Object.entries(NACCA_DIAGRAMS).map(([subj, list]) => (
+            <optgroup key={subj} label={`NaCCA ${subj}`}>
+              {(list as {label:string;url:string}[]).map((item, i) => (
+                <option key={i} value={item.url}>📌 {item.label}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+        {editImageUrl && (
+          <img src={editImageUrl} alt="Preview" className="mt-2 max-h-28 rounded border" />
+        )}
+      </div>
       <div className="flex gap-2">
         <button onClick={() => saveEdit(sIdx, qIdx)} className="px-3 py-1.5 bg-green-600 text-white rounded text-xs font-medium">✓ Save</button>
         <button onClick={() => setEditingQuestion(null)} className="px-3 py-1.5 bg-gray-400 text-white rounded text-xs">Cancel</button>
@@ -178,26 +224,41 @@ export default function ExamPreview({ exam, onUpdate }: Props) {
       />
 
       <div className="mb-3">
-        <label className="text-xs font-medium text-gray-500 block mb-1">Question Image URL (Optional):</label>
-        <div className="flex gap-2">
+        <label className="text-xs font-medium text-gray-500 block mb-1">Insert Diagram / Shape / Webpage Image URL:</label>
+        <div className="flex gap-2 mb-1">
           <input
             type="text"
             value={editImageUrl}
             onChange={e => setEditImageUrl(e.target.value)}
-            className="flex-1 px-2 py-1 border rounded text-sm"
-            placeholder="/images/science-practical-1.jpg"
+            className="flex-1 px-2 py-1 border rounded text-xs"
+            placeholder="Paste any image URL from a webpage..."
           />
-          <select
-            onChange={e => setEditImageUrl(e.target.value)}
-            className="px-2 py-1 border rounded text-sm"
+          <button
+            type="button"
+            onClick={() => setShowShapeModal(true)}
+            className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold whitespace-nowrap"
           >
-            <option value="">Select image...</option>
-            <option value="/images/science-practical-1.jpg">Science Practical</option>
-            <option value="/images/computing-flowchart-1.jpg">Computing Flowchart</option>
-            <option value="/images/creative-arts-adinkra-1.jpg">Creative Arts Adinkra</option>
-            <option value="/images/career-tech-design-1.jpg">Career Tech Design</option>
-          </select>
+            📐 Custom Shape...
+          </button>
         </div>
+        <select
+          onChange={e => setEditImageUrl(e.target.value)}
+          className="w-full px-2 py-1 border rounded text-xs bg-white"
+        >
+          <option value="">— Or pick from NaCCA Diagram Library —</option>
+          <optgroup label="Mathematics Shapes">
+            {MATH_SHAPE_OPTIONS.map((shape, i) => (
+              <option key={i} value={shape.url}>📐 {shape.label}</option>
+            ))}
+          </optgroup>
+          {Object.entries(NACCA_DIAGRAMS).map(([subj, list]) => (
+            <optgroup key={subj} label={`NaCCA ${subj}`}>
+              {(list as {label:string;url:string}[]).map((item, i) => (
+                <option key={i} value={item.url}>📌 {item.label}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
         {editImageUrl && (
           <img src={editImageUrl} alt="Preview" className="mt-2 max-h-32 rounded border" />
         )}
@@ -283,7 +344,7 @@ export default function ExamPreview({ exam, onUpdate }: Props) {
           {exam.schoolName}
         </h1>
         <p style={{ fontSize: '9pt', margin: '2px 0', fontStyle: 'italic', color: '#555' }}>
-          Nurturing Excellence Through Knowledge
+          Motto: Seeking Wisdom
         </p>
         <h2 style={{ fontSize: '13pt', fontWeight: 'bold', textTransform: 'uppercase', margin: '8px 0 0 0' }}>
           {exam.examType}
@@ -336,14 +397,19 @@ export default function ExamPreview({ exam, onUpdate }: Props) {
                     renderObjectiveEditor(q, sIdx, qIdx)
                   ) : (
                     <div className="group relative" style={{ paddingRight: '30px' }}>
-                      <p style={{ fontSize: '11pt', margin: '0 0 4px 0' }}>
-                        <strong>{q.questionNumber}.</strong> {q.question}
+                      <p style={{ fontSize: '16pt', margin: '0 0 6px 0', lineHeight: '1.4' }}>
+                        <strong>{q.questionNumber}.</strong> <MathFormattedText text={q.question} />
                       </p>
+                      {q.imageUrl && (
+                        <div style={{ margin: '8px 0 8px 20px' }}>
+                          <img src={q.imageUrl} alt="Diagram" style={{ maxWidth: '240px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                        </div>
+                      )}
                       {q.options && (
-                        <div style={{ marginLeft: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 16px' }}>
+                        <div style={{ marginLeft: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 20px' }}>
                           {q.options.map((opt, oIdx) => (
-                            <span key={oIdx} style={{ fontSize: '10.5pt' }}>
-                              {String.fromCharCode(65 + oIdx)}. {opt}
+                            <span key={oIdx} style={{ fontSize: '16pt', lineHeight: '1.4' }}>
+                              {String.fromCharCode(65 + oIdx)}. <MathFormattedText text={opt} />
                             </span>
                           ))}
                         </div>
@@ -379,11 +445,11 @@ export default function ExamPreview({ exam, onUpdate }: Props) {
                           🔬 PRACTICAL
                         </p>
                       )}
-                      <p style={{ fontSize: '11pt', fontWeight: 600, margin: '0 0 4px 0' }}>
+                      <p style={{ fontSize: '16pt', fontWeight: 600, margin: '0 0 4px 0', lineHeight: '1.4' }}>
                         Question {q.questionNumber}. [{q.marks} marks]
                       </p>
-                      <div style={{ fontSize: '11pt', whiteSpace: 'pre-wrap', margin: '0 0 8px 0' }}>
-                        {q.question}
+                      <div style={{ fontSize: '16pt', whiteSpace: 'pre-wrap', margin: '0 0 8px 0', lineHeight: '1.4' }}>
+                        <MathFormattedText text={q.question} />
                       </div>
 
                       {q.imageUrl && (
@@ -394,8 +460,8 @@ export default function ExamPreview({ exam, onUpdate }: Props) {
 
                       {q.subQuestions && q.subQuestions.map(sq => (
                         <div key={sq.id} style={{ marginLeft: '20px', marginBottom: '8px' }}>
-                          <p style={{ fontSize: '11pt' }}>
-                            <strong>({sq.label})</strong> {sq.question} <span style={{ fontSize: '9pt', color: '#666' }}>[{sq.marks} marks]</span>
+                          <p style={{ fontSize: '16pt', lineHeight: '1.4' }}>
+                            <strong>({sq.label})</strong> <MathFormattedText text={sq.question} /> <span style={{ fontSize: '12pt', color: '#666' }}>[{sq.marks} marks]</span>
                           </p>
                           {sq.imageUrl && (
                             <div style={{ margin: '4px 0' }}>
@@ -427,8 +493,32 @@ export default function ExamPreview({ exam, onUpdate }: Props) {
       {/* End of Paper */}
       <div style={{ textAlign: 'center', borderTop: '2px solid #000', paddingTop: '12px', marginTop: '30px', fontSize: '10pt' }}>
         <p style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>END OF {exam.examType.toUpperCase()}</p>
-        <p style={{ fontSize: '8pt', color: '#999', marginTop: '4px' }}>© {exam.academicYear} {exam.schoolName}</p>
+        <p className="no-print" style={{ fontSize: '8pt', color: '#999', marginTop: '4px' }}>© {exam.academicYear} {exam.schoolName}</p>
       </div>
+
+      {showShapeModal && (
+        <CustomShapeBuilderModal
+          onClose={() => setShowShapeModal(false)}
+          onInsert={(res: CustomShapeResult) => {
+            setEditImageUrl(res.svgDataUrl);
+            if (res.suggestedQuestion && !editText) {
+              setEditText(res.suggestedQuestion);
+              setEditAnswer(res.suggestedAnswer);
+              setEditMarks(res.suggestedMarks);
+              if (res.subQuestions) {
+                setEditSubQuestions(res.subQuestions.map((sq, i) => ({
+                  id: `sq_${Date.now()}_${i}`,
+                  label: sq.label,
+                  question: sq.question,
+                  answer: sq.answer,
+                  marks: sq.marks,
+                })));
+              }
+            }
+            setShowShapeModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }

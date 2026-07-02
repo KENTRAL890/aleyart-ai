@@ -4,6 +4,7 @@ import { getSavedExams, deleteExam, updateExam } from '../store';
 import { CLASS_LEVELS, EARLY_CHILDHOOD_LEVELS } from '../data/constants';
 import ExamPreview from './ExamPreview';
 import MarkingSchemeView from './MarkingSchemeView';
+import { printElementsClean } from '../utils/printDocument';
 
 interface Props {
   user: User;
@@ -62,7 +63,7 @@ export default function SavedExams({ user: _user }: Props) {
           <button onClick={() => { setViewingExam(null); setShowMarking(false); }} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition">
             ← Back to List
           </button>
-          <button onClick={() => window.print()} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">
+          <button onClick={() => printElementsClean('.exam-paper')} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">
             🖨️ Print
           </button>
           <button onClick={() => setShowMarking(!showMarking)} className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition">

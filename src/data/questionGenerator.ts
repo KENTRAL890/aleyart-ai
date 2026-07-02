@@ -240,6 +240,13 @@ const QUESTION_BANKS: Record<string, Record<string, { q: string; options?: strin
     'Letter Writing': [
       { q: 'A formal letter should include ___', options: ['Slang words', 'Sender\'s address', 'Drawings', 'Jokes'], answer: 'Sender\'s address', type: 'mc' },
     ],
+    'Literature - The Beacon of Light': [
+      { q: 'In "The Beacon of Light", what does the lighthouse symbolize?', options: ['Wealth and gold', 'Education and hope', 'Danger at sea', 'Colonial power'], answer: 'Education and hope', type: 'mc' },
+      { q: 'Who is the village teacher that supports Kwame\'s dream in "The Beacon of Light"?', options: ['Mr. Ansah', 'Mr. Mensah', 'Chief Osei', 'Kofi'], answer: 'Mr. Ansah', type: 'mc' },
+      { q: 'What coastal town forms the primary setting of "The Beacon of Light"?', options: ['Elmina', 'Cape Coast', 'Anomabo', 'Winneba'], answer: 'Anomabo', type: 'mc' },
+      { q: 'What major event at sea early in the novel teaches Kwame about resilience?', options: ['A pirate attack', 'A severe ocean storm', 'A ship wreckage', 'A great tsunami'], answer: 'A severe ocean storm', type: 'mc' },
+      { q: 'Why did Kwame study by the flickering light of an oil lamp every evening?', options: ['His family lacked electricity and wealth', 'He preferred dark rooms', 'He was hiding from his friends', 'The school was closed during daytime'], answer: 'His family lacked electricity and wealth', type: 'mc' },
+    ],
   },
   'Science': {
     'Living Things': [
@@ -863,6 +870,14 @@ const SUBJECTIVE_BANKS: Record<string, Record<string, { q: string; answer: strin
         { label: 'd', q: 'Punctuate the following sentence correctly: "where is kofi going asked ama"', answer: 'Correctly punctuated: "Where is Kofi going?" asked Ama.\n\nExplanation:\n- "Where" starts a sentence, so it needs a capital letter\n- "Kofi" and "Ama" are proper nouns, so they need capital letters\n- The question needs a question mark\n- The reported speech needs quotation marks', marks: 4 },
       ]},
     ],
+    'literature': [
+      { q: 'Read the excerpt below from "The Beacon of Light" and answer the questions that follow:\n\n"The dark clouds gathered over the coastal town of Anomabo as young Kwame stared out into the turbulent waves. As the wind howled through the palm fronds, he remembered his father\'s advice: \'A beacon of light guides the steady sailor through the darkest night.\'"', answer: '', marks: 10, subQs: [
+        { label: 'a', q: 'Where does the story take place?', answer: 'The story takes place in the coastal town of Anomabo.', marks: 2 },
+        { label: 'b', q: 'What advice did Kwame\'s father give him?', answer: 'He advised that "A beacon of light guides the steady sailor through the darkest night."', marks: 3 },
+        { label: 'c', q: 'Explain the symbolic meaning of "a beacon of light" as used in the novel.', answer: 'It symbolizes hope, education, and moral guidance amidst life\'s storms and hardships.', marks: 3 },
+        { label: 'd', q: 'Identify one literary device used in "the wind howled through the palm fronds".', answer: 'Personification (giving human howling qualities to the wind).', marks: 2 },
+      ]},
+    ],
   },
   'Social Studies': {
     'default': [
@@ -1010,6 +1025,7 @@ function generateSubjectiveQuestions(
 function generateEnglishSectionB(
   classLevel: ClassLevel,
   _topics: string[],
+  literatureExcerpt?: { title: string; excerpt: string; questions: { q: string; answer: string }[] },
 ): ExamSection[] {
   const isB7toB9 = ['Basic 7', 'Basic 8', 'Basic 9'].includes(classLevel);
   const sections: ExamSection[] = [];
@@ -1115,6 +1131,64 @@ function generateEnglishSectionB(
         })),
       }] : [],
     });
+
+    // Literature (The Beacon of Light) - 10 marks
+    const litBanks = SUBJECTIVE_BANKS['English Language']?.['literature'] || [];
+    const litQ = litBanks[0];
+    let litQuestionObj: Question;
+
+    if (literatureExcerpt && literatureExcerpt.excerpt) {
+      litQuestionObj = {
+        id: uid(),
+        questionNumber: 1,
+        type: 'Subjective',
+        question: `Read the excerpt below from "The Beacon of Light" (${literatureExcerpt.title}) and answer the questions that follow:\n\n"${literatureExcerpt.excerpt}"`,
+        correctAnswer: '',
+        marks: 10,
+        subQuestions: literatureExcerpt.questions.map((qItem, idx) => ({
+          id: uid(),
+          label: String.fromCharCode(97 + idx),
+          question: qItem.q,
+          answer: qItem.answer,
+          marks: Math.floor(10 / literatureExcerpt.questions.length) || 3,
+        })),
+      };
+    } else if (litQ) {
+      litQuestionObj = {
+        id: uid(),
+        questionNumber: 1,
+        type: 'Subjective',
+        question: litQ.q,
+        correctAnswer: litQ.answer,
+        marks: 10,
+        subQuestions: litQ.subQs?.map(sq => ({
+          id: uid(),
+          label: sq.label,
+          question: sq.q,
+          answer: sq.answer,
+          marks: sq.marks,
+        })),
+      };
+    } else {
+      litQuestionObj = {
+        id: uid(),
+        questionNumber: 1,
+        type: 'Subjective',
+        question: 'Answer the following literature questions based on "The Beacon of Light".',
+        correctAnswer: '',
+        marks: 10,
+      };
+    }
+
+    sections.push({
+      id: uid(),
+      sectionLabel: 'F',
+      title: 'SECTION F: LITERATURE (THE BEACON OF LIGHT)',
+      instructions: 'Answer ALL questions in this section.',
+      totalMarks: 10,
+      isObjective: false,
+      questions: [litQuestionObj],
+    });
   }
   
   return sections;
@@ -1124,6 +1198,7 @@ export function generateExamPaper(config: {
   classLevel: ClassLevel;
   subject: Subject;
   examType: ExamType;
+  difficulty?: 'Easy' | 'Medium' | 'Hard';
   term: string;
   academicYear: string;
   duration: string;
@@ -1135,6 +1210,9 @@ export function generateExamPaper(config: {
   subjectiveMarks: number;
   subjectiveSections: string[];
   subjectiveInstructions?: string;
+  customObjectives?: { question: string; options: string[]; correctAnswer: string; imageUrl?: string }[];
+  customSubjectives?: { question: string; answer: string; marks: number; imageUrl?: string; subQuestions?: { label: string; question: string; answer: string; marks: number }[] }[];
+  literatureExcerpt?: { title: string; excerpt: string; questions: { q: string; answer: string }[] };
   createdBy: string;
 }): ExamPaper {
   const allTopics = [...config.topics, ...config.additionalTopics];
@@ -1150,8 +1228,29 @@ export function generateExamPaper(config: {
   
   // Section A - Objectives
   if (config.objectiveCount > 0) {
-    const objectiveQuestions = getQuestionsFromBank(config.subject as string, allTopics, config.objectiveCount);
-    const marksPerQ = Math.floor(config.objectiveMarks / config.objectiveCount);
+    let objectiveQuestions: Question[] = [];
+    if (config.customObjectives && config.customObjectives.length > 0) {
+      objectiveQuestions = config.customObjectives.map((co, idx) => ({
+        id: uid(),
+        questionNumber: idx + 1,
+        type: 'Multiple Choice' as const,
+        question: co.question,
+        options: co.options,
+        correctAnswer: co.correctAnswer,
+        marks: 1,
+        imageUrl: co.imageUrl,
+      }));
+    }
+
+    const needed = config.objectiveCount - objectiveQuestions.length;
+    if (needed > 0) {
+      const bankQs = getQuestionsFromBank(config.subject as string, allTopics, needed);
+      objectiveQuestions = [...objectiveQuestions, ...bankQs];
+    } else {
+      objectiveQuestions = objectiveQuestions.slice(0, config.objectiveCount);
+    }
+
+    const marksPerQ = Math.floor(config.objectiveMarks / config.objectiveCount) || 1;
     objectiveQuestions.forEach((q, i) => {
       q.marks = i < config.objectiveCount - 1 ? marksPerQ : config.objectiveMarks - marksPerQ * (config.objectiveCount - 1);
       q.questionNumber = i + 1;
@@ -1160,7 +1259,7 @@ export function generateExamPaper(config: {
     sections.push({
       id: uid(),
       sectionLabel: 'A',
-      title: 'SECTION A: OBJECTIVE',
+      title: `SECTION A: OBJECTIVE ${config.difficulty ? `[DIFFICULTY: ${config.difficulty.toUpperCase()}]` : ''}`,
       instructions: `Answer ALL questions. Each question carries ${marksPerQ} mark(s). Choose the correct answer from the options lettered A to D.`,
       questions: objectiveQuestions,
       totalMarks: config.objectiveMarks,
@@ -1175,13 +1274,14 @@ export function generateExamPaper(config: {
         question: q.question,
         correctAnswer: q.correctAnswer,
         marks: q.marks,
+        imageUrl: q.imageUrl,
       });
     });
   }
   
   // Section B - Subjective
   if (isEnglish && isB7toB9) {
-    const englishSections = generateEnglishSectionB(config.classLevel, allTopics);
+    const englishSections = generateEnglishSectionB(config.classLevel, allTopics, config.literatureExcerpt);
     sections.push(...englishSections);
     
     englishSections.forEach(section => {
@@ -1193,6 +1293,7 @@ export function generateExamPaper(config: {
           question: q.question,
           correctAnswer: q.correctAnswer,
           marks: q.marks,
+          imageUrl: q.imageUrl,
           subAnswers: q.subQuestions?.map(sq => ({
             label: sq.label,
             answer: sq.answer,
@@ -1207,14 +1308,42 @@ export function generateExamPaper(config: {
       (['Basic 6', ...['Basic 7', 'Basic 8', 'Basic 9']].includes(config.classLevel) && config.subject === 'Computing')
     );
     
-    const marksPerSubjQ = Math.floor(config.subjectiveMarks / config.subjectiveCount);
-    const subjectiveQuestions = generateSubjectiveQuestions(
-      config.subject as string,
-      config.classLevel,
-      allTopics,
-      config.subjectiveCount,
-      marksPerSubjQ,
-    );
+    const marksPerSubjQ = Math.floor(config.subjectiveMarks / config.subjectiveCount) || 10;
+    let subjectiveQuestions: Question[] = [];
+    
+    if (config.customSubjectives && config.customSubjectives.length > 0) {
+      subjectiveQuestions = config.customSubjectives.map((cs, idx) => ({
+        id: uid(),
+        questionNumber: idx + 1,
+        type: 'Subjective',
+        question: cs.question,
+        correctAnswer: cs.answer,
+        marks: cs.marks || marksPerSubjQ,
+        imageUrl: cs.imageUrl,
+        subQuestions: cs.subQuestions?.map(sq => ({
+          id: uid(),
+          label: sq.label,
+          question: sq.question,
+          answer: sq.answer,
+          marks: sq.marks,
+        })),
+      }));
+    }
+
+    const neededSubj = config.subjectiveCount - subjectiveQuestions.length;
+    if (neededSubj > 0) {
+      const genSubj = generateSubjectiveQuestions(
+        config.subject as string,
+        config.classLevel,
+        allTopics,
+        neededSubj,
+        marksPerSubjQ,
+      );
+      subjectiveQuestions = [...subjectiveQuestions, ...genSubj];
+    } else {
+      subjectiveQuestions = subjectiveQuestions.slice(0, config.subjectiveCount);
+    }
+    subjectiveQuestions.forEach((q, idx) => { q.questionNumber = idx + 1; });
     
     // Use custom instructions or generate default
     let sectionInstructions = config.subjectiveInstructions || '';
@@ -1244,6 +1373,7 @@ export function generateExamPaper(config: {
         question: q.question,
         correctAnswer: q.correctAnswer,
         marks: q.marks,
+        imageUrl: q.imageUrl,
         subAnswers: q.subQuestions?.map(sq => ({
           label: sq.label,
           answer: sq.answer,
@@ -1259,6 +1389,7 @@ export function generateExamPaper(config: {
     classLevel: config.classLevel,
     subject: config.subject,
     examType: config.examType,
+    difficulty: config.difficulty,
     term: config.term,
     academicYear: config.academicYear,
     duration: config.duration,

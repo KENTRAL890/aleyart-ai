@@ -46,6 +46,7 @@ export default function LoginPage({ onLogin }: Props) {
             <span className="text-3xl">🎓</span>
           </div>
           <h1 className="text-3xl font-bold text-white mb-1">ALEYART ACADEMY</h1>
+          <p className="text-blue-200 text-xs italic mb-1">Motto: Seeking Wisdom</p>
           <p className="text-blue-200 text-sm">Exam Generation System</p>
         </div>
 

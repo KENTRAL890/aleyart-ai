@@ -1,4 +1,5 @@
 import type { ExamPaper } from '../types';
+import MathFormattedText from './MathFormattedText';
 
 interface Props {
   exam: ExamPaper;
@@ -12,6 +13,7 @@ export default function MarkingSchemeView({ exam }: Props) {
         <h1 style={{ fontSize: '16pt', fontWeight: 'bold', letterSpacing: '2px', textTransform: 'uppercase', margin: 0 }}>
           {exam.schoolName}
         </h1>
+        <p style={{ fontSize: '9pt', fontStyle: 'italic', color: '#555', margin: '2px 0 0 0' }}>Motto: Seeking Wisdom</p>
         <h2 style={{ fontSize: '13pt', fontWeight: 'bold', color: '#c62828', margin: '8px 0 0 0' }}>
           MARKING SCHEME — CONFIDENTIAL
         </h2>
@@ -27,9 +29,9 @@ export default function MarkingSchemeView({ exam }: Props) {
         </div>
       </div>
 
-      {/* Sections */}
-      {exam.sections.map(section => (
-        <div key={section.id} style={{ marginBottom: '24px' }}>
+      {/* Sections — Objective answers on page 1, subjective flows to page 2+ */}
+      {exam.sections.map((section, sectionIdx) => (
+        <div key={section.id} style={{ marginBottom: '24px', pageBreakAfter: section.isObjective && sectionIdx < exam.sections.length - 1 ? 'always' : 'auto' }}>
           <div style={{
             background: '#f0f0f0',
             border: '1px solid #999',
@@ -62,7 +64,12 @@ export default function MarkingSchemeView({ exam }: Props) {
                       <tr key={q.id} style={{ breakInside: 'avoid' }}>
                         <td style={{ border: '1px solid #999', padding: '3px 8px', textAlign: 'center', fontWeight: 'bold' }}>{q.questionNumber}</td>
                         <td style={{ border: '1px solid #999', padding: '3px 8px', textAlign: 'center', fontWeight: 'bold', color: '#16a34a' }}>{letter}</td>
-                        <td style={{ border: '1px solid #999', padding: '3px 8px', color: '#166534' }}>{q.correctAnswer}</td>
+                        <td style={{ border: '1px solid #999', padding: '3px 8px', color: '#166534' }}>
+                          <MathFormattedText text={q.correctAnswer} />
+                          {q.imageUrl && (
+                            <img src={q.imageUrl} alt="Ref" style={{ maxHeight: '36px', marginLeft: '8px', verticalAlign: 'middle', display: 'inline-block', border: '1px solid #ccc' }} />
+                          )}
+                        </td>
                         <td style={{ border: '1px solid #999', padding: '3px 8px', textAlign: 'center' }}>{q.marks}</td>
                       </tr>
                     );
@@ -88,21 +95,28 @@ export default function MarkingSchemeView({ exam }: Props) {
                     {q.question.length > 150 ? q.question.substring(0, 150) + '...' : q.question}
                   </div>
 
+                  {q.imageUrl && (
+                    <div style={{ margin: '8px 0', padding: '6px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '4px', display: 'inline-block' }}>
+                      <span style={{ fontSize: '8pt', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '4px' }}>📌 Diagram Reference:</span>
+                      <img src={q.imageUrl} alt="Marking scheme reference diagram" style={{ maxHeight: '110px', borderRadius: '2px' }} />
+                    </div>
+                  )}
+
                   {q.correctAnswer && !q.subQuestions?.length && (
                     <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '6px', padding: '10px', marginBottom: '8px' }}>
                       <p style={{ fontSize: '9pt', fontWeight: 'bold', color: '#166534', margin: '0 0 4px 0' }}>✅ CORRECT ANSWER:</p>
-                      <p style={{ fontSize: '10pt', color: '#14532d', whiteSpace: 'pre-wrap', margin: 0 }}>{q.correctAnswer}</p>
+                      <p style={{ fontSize: '10pt', color: '#14532d', whiteSpace: 'pre-wrap', margin: 0 }}><MathFormattedText text={q.correctAnswer} /></p>
                     </div>
                   )}
 
                   {q.subQuestions && q.subQuestions.map(sq => (
                     <div key={sq.id} style={{ marginLeft: '20px', marginBottom: '10px' }}>
                       <p style={{ fontWeight: '600', fontSize: '10pt', margin: '0 0 4px 0' }}>
-                        ({sq.label}) {sq.question} <span style={{ color: '#888', fontSize: '9pt' }}>[{sq.marks} marks]</span>
+                        ({sq.label}) <MathFormattedText text={sq.question} /> <span style={{ color: '#888', fontSize: '9pt' }}>[{sq.marks} marks]</span>
                       </p>
                       <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '6px', padding: '8px' }}>
                         <p style={{ fontSize: '9pt', fontWeight: 'bold', color: '#166534', margin: '0 0 4px 0' }}>✅ ANSWER:</p>
-                        <p style={{ fontSize: '10pt', color: '#14532d', whiteSpace: 'pre-wrap', margin: 0 }}>{sq.answer}</p>
+                        <p style={{ fontSize: '10pt', color: '#14532d', whiteSpace: 'pre-wrap', margin: 0 }}><MathFormattedText text={sq.answer} /></p>
                         <p style={{ fontSize: '8pt', color: '#16a34a', margin: '4px 0 0 0' }}>Award: {sq.marks} mark(s)</p>
                       </div>
                     </div>
@@ -111,7 +125,7 @@ export default function MarkingSchemeView({ exam }: Props) {
                   {q.working && (
                     <div style={{ background: '#eff6ff', border: '1px solid #93c5fd', borderRadius: '6px', padding: '10px', marginTop: '8px', marginLeft: '20px' }}>
                       <p style={{ fontSize: '9pt', fontWeight: 'bold', color: '#1e40af', margin: '0 0 4px 0' }}>📐 FULL WORKING / SOLUTION:</p>
-                      <p style={{ fontSize: '10pt', color: '#1e3a5f', whiteSpace: 'pre-wrap', margin: 0 }}>{q.working}</p>
+                      <p style={{ fontSize: '10pt', color: '#1e3a5f', whiteSpace: 'pre-wrap', margin: 0 }}><MathFormattedText text={q.working} /></p>
                     </div>
                   )}
                 </div>
@@ -121,15 +135,15 @@ export default function MarkingSchemeView({ exam }: Props) {
         </div>
       ))}
 
-      {/* Footer */}
-      <div style={{ textAlign: 'center', borderTop: '3px double #c62828', paddingTop: '12px', marginTop: '30px' }}>
+      {/* Footer — only the CONFIDENTIAL label prints, rest hidden */}
+      <div style={{ textAlign: 'center', borderTop: '2px solid #c62828', paddingTop: '10px', marginTop: '30px' }}>
         <p style={{ fontWeight: 'bold', color: '#c62828', fontSize: '10pt', textTransform: 'uppercase' }}>
-          ⚠️ THIS MARKING SCHEME IS STRICTLY CONFIDENTIAL ⚠️
+          THIS MARKING SCHEME IS STRICTLY CONFIDENTIAL
         </p>
-        <p style={{ fontSize: '9pt', color: '#999', marginTop: '4px' }}>
+        <p className="no-print" style={{ fontSize: '9pt', color: '#999', marginTop: '4px' }}>
           Contains exact correct answers, full solutions, calculations, working, and marks allocation.
         </p>
-        <p style={{ fontSize: '8pt', color: '#999', marginTop: '4px' }}>
+        <p className="no-print" style={{ fontSize: '8pt', color: '#999', marginTop: '4px' }}>
           © {exam.academicYear} {exam.schoolName}
         </p>
       </div>

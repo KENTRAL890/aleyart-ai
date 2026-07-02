@@ -131,7 +131,7 @@ export default function EarlyChildhood({ user }: Props) {
           <button onClick={saveAssessment} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition">
             💾 Save Assessment
           </button>
-          <button onClick={() => window.print()} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">
+          <button onClick={() => { document.title = ' '; window.print(); }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">
             🖨️ Print
           </button>
         </div>
@@ -139,6 +139,7 @@ export default function EarlyChildhood({ user }: Props) {
         <div className="exam-paper">
           <div className="text-center border-b-2 border-black pb-4 mb-6">
             <h1 className="text-xl font-bold uppercase">ALEYART ACADEMY</h1>
+            <p className="text-xs italic text-gray-500 mt-0.5">Motto: Seeking Wisdom</p>
             <h2 className="text-base font-semibold mt-1">EARLY CHILDHOOD ASSESSMENT REPORT</h2>
             <div className="grid grid-cols-2 gap-2 mt-3 text-sm text-left">
               <p><strong>Child's Name:</strong> {assessment.childName}</p>
@@ -298,6 +299,131 @@ export default function EarlyChildhood({ user }: Props) {
           >
             📋 Generate Assessment Form
           </button>
+
+          {/* NaCCA Sample Assessment Questions Per Level */}
+          {selectedLevel && (
+            <div className="mt-6 bg-white rounded-xl p-5 border border-blue-100">
+              <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                <span>📝</span> NaCCA Sample Assessment Activities — {selectedLevel}
+              </h4>
+              <div className="space-y-3 text-sm">
+                {selectedLevel === 'Creche' && (
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-500 italic">Assessment through observation only. No written questions.</p>
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <p className="font-bold text-xs text-blue-900 mb-1">Physical Development Observations:</p>
+                      <ul className="text-xs space-y-0.5 text-gray-700">
+                        <li>• Can the child sit upright without support?</li>
+                        <li>• Does the child grasp objects placed in their hand?</li>
+                        <li>• Does the child crawl or attempt to stand?</li>
+                        <li>• Does the child respond when called by name?</li>
+                      </ul>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                      <p className="font-bold text-xs text-green-900 mb-1">Social & Communication Observations:</p>
+                      <ul className="text-xs space-y-0.5 text-gray-700">
+                        <li>• Does the child smile when spoken to?</li>
+                        <li>• Does the child babble or make sounds?</li>
+                        <li>• Does the child make eye contact with caregivers?</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+                {selectedLevel === 'N1' && (
+                  <div className="space-y-2">
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <p className="font-bold text-xs text-blue-900 mb-1">Oral & Practical Activities:</p>
+                      <ul className="text-xs space-y-0.5 text-gray-700">
+                        <li>• Ask: "What colour is this?" (Show red, blue, yellow objects)</li>
+                        <li>• Ask: "Can you count these blocks?" (1–5)</li>
+                        <li>• Activity: Sing "Twinkle Twinkle Little Star" together</li>
+                        <li>• Activity: Sort objects by colour (red group, blue group)</li>
+                        <li>• Activity: Hold a pencil and draw a line</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+                {selectedLevel === 'N2' && (
+                  <div className="space-y-2">
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <p className="font-bold text-xs text-blue-900 mb-1">Oral & Practical Activities:</p>
+                      <ul className="text-xs space-y-0.5 text-gray-700">
+                        <li>• Ask: "What shape is this?" (Show circle, square, triangle)</li>
+                        <li>• Ask: "Can you count from 1 to 10?"</li>
+                        <li>• Activity: Tell a short story and ask child to retell it</li>
+                        <li>• Activity: Colour inside a circle without going outside the lines</li>
+                        <li>• Activity: Cut along a straight line with scissors</li>
+                        <li>• Activity: Identify 5 animals by their pictures</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+                {selectedLevel === 'KG1' && (
+                  <div className="space-y-2">
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <p className="font-bold text-xs text-blue-900 mb-1">Literacy & Language (Oral):</p>
+                      <ul className="text-xs space-y-0.5 text-gray-700">
+                        <li>• "What letter is this?" (Show A, B, C... flash cards)</li>
+                        <li>• "What sound does the letter S make?"</li>
+                        <li>• "Can you recite the alphabet from A to Z?"</li>
+                        <li>• Read a short story aloud and ask: "Who is the main character?"</li>
+                      </ul>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                      <p className="font-bold text-xs text-green-900 mb-1">Numeracy (Practical):</p>
+                      <ul className="text-xs space-y-0.5 text-gray-700">
+                        <li>• "Count these pencils." (up to 20)</li>
+                        <li>• "If I give you 2 sweets and 1 more, how many do you have?"</li>
+                        <li>• Activity: Sort shapes (circles, squares, triangles)</li>
+                        <li>• Activity: Arrange objects from smallest to largest</li>
+                      </ul>
+                    </div>
+                    <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                      <p className="font-bold text-xs text-yellow-900 mb-1">Environmental Studies (Oral):</p>
+                      <ul className="text-xs space-y-0.5 text-gray-700">
+                        <li>• "Who are the members of your family?"</li>
+                        <li>• "What is the name of your school?"</li>
+                        <li>• "Name two animals you know."</li>
+                        <li>• "What happens when it rains?"</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+                {selectedLevel === 'KG2' && (
+                  <div className="space-y-2">
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <p className="font-bold text-xs text-blue-900 mb-1">Literacy & Language (Oral + Writing Readiness):</p>
+                      <ul className="text-xs space-y-0.5 text-gray-700">
+                        <li>• "Write the letter M." / "Write your name."</li>
+                        <li>• "What word begins with the sound 'B'?"</li>
+                        <li>• "Blend these sounds: C-A-T. What word is it?"</li>
+                        <li>• Read a passage and ask: "What happened in the story?"</li>
+                      </ul>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                      <p className="font-bold text-xs text-green-900 mb-1">Numeracy (Practical + Oral):</p>
+                      <ul className="text-xs space-y-0.5 text-gray-700">
+                        <li>• "Count from 1 to 50."</li>
+                        <li>• "Write the number 15."</li>
+                        <li>• "3 + 2 = ?" (Use objects to help)</li>
+                        <li>• "5 - 1 = ?" (Take away 1 block from 5)</li>
+                        <li>• Activity: Identify and name these shapes (rectangle, oval)</li>
+                      </ul>
+                    </div>
+                    <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                      <p className="font-bold text-xs text-yellow-900 mb-1">Environmental Studies (Oral):</p>
+                      <ul className="text-xs space-y-0.5 text-gray-700">
+                        <li>• "What season are we in now — rainy or dry?"</li>
+                        <li>• "Name three things we do to stay healthy."</li>
+                        <li>• "Name two plants in our school compound."</li>
+                        <li>• "Why do we wash our hands before eating?"</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div>

@@ -23,14 +23,34 @@ export default function Dashboard({ user, onLogout }: Props) {
     onLogout();
   };
 
-  const menuItems: { id: Page; label: string; icon: string; desc: string }[] = [
-    { id: 'home', label: 'Dashboard', icon: '🏠', desc: 'Overview' },
-    { id: 'generate', label: 'Generate Exam', icon: '📝', desc: 'Create new exam' },
-    { id: 'saved', label: 'Saved Exams', icon: '💾', desc: 'View stored exams' },
-    { id: 'early', label: 'Early Childhood', icon: '🧒', desc: 'Crèche - KG2' },
-    { id: 'special', label: 'Special Exams', icon: '🏆', desc: 'BECE / Entrance / Transitional' },
-    { id: 'omr', label: 'OMR Sheets', icon: '📋', desc: 'Answer shading sheets' },
-    { id: 'booklet', label: 'Answer Booklet', icon: '📖', desc: 'Create answer booklets' },
+  const menuGroups = [
+    {
+      category: 'Main Overview',
+      items: [
+        { id: 'home' as Page, label: 'Dashboard Overview', icon: '🏠', desc: 'System statistics & quick links' },
+      ],
+    },
+    {
+      category: 'Exam Generation (SBC & CCP)',
+      items: [
+        { id: 'generate' as Page, label: 'Generate Standard Exam', icon: '📝', desc: 'Basic 1–9 custom test builder' },
+        { id: 'special' as Page, label: 'Special Exams Studio', icon: '🏆', desc: 'BECE / Entrance / Transitional' },
+      ],
+    },
+    {
+      category: 'Exam Repository & Marking',
+      items: [
+        { id: 'saved' as Page, label: 'Saved Exams & Schemes', icon: '💾', desc: 'Access stored exams & marking schemes' },
+      ],
+    },
+    {
+      category: 'Assessment & Print Supplies',
+      items: [
+        { id: 'early' as Page, label: 'Early Childhood Tracking', icon: '🧒', desc: 'Crèche – KG2 NaCCA SBA' },
+        { id: 'omr' as Page, label: 'BECE Box OMR Sheets', icon: '📋', desc: 'Standard A4 horizontal shading' },
+        { id: 'booklet' as Page, label: 'Exam Answer Booklets', icon: '📖', desc: 'Ruled booklets with margin lines' },
+      ],
+    },
   ];
 
   const renderContent = () => {
@@ -73,28 +93,33 @@ export default function Dashboard({ user, onLogout }: Props) {
             </div>
             <div>
               <h2 className="text-white font-bold text-sm">ALEYART ACADEMY</h2>
-              <p className="text-blue-300 text-[10px]">Exam Generator</p>
+              <p className="text-blue-300 text-[9px] italic">Seeking Wisdom</p>
             </div>
             <button className="lg:hidden ml-auto text-white text-xl" onClick={() => setSidebarOpen(false)}>✕</button>
           </div>
 
-          <nav className="space-y-1">
-            {menuItems.map(item => (
-              <button
-                key={item.id}
-                onClick={() => { setCurrentPage(item.id); setSidebarOpen(false); }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
-                  currentPage === item.id
-                    ? 'bg-white/15 text-white shadow-lg'
-                    : 'text-blue-200 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <span className="text-lg">{item.icon}</span>
-                <div>
-                  <p className="text-sm font-medium">{item.label}</p>
-                  <p className="text-[10px] opacity-70">{item.desc}</p>
-                </div>
-              </button>
+          <nav className="space-y-4 pb-24 overflow-y-auto max-h-[calc(100vh-210px)]">
+            {menuGroups.map(group => (
+              <div key={group.category} className="space-y-1">
+                <p className="px-3 text-[10px] font-bold text-blue-300 uppercase tracking-wider opacity-80 mb-1">{group.category}</p>
+                {group.items.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => { setCurrentPage(item.id); setSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 ${
+                      currentPage === item.id
+                        ? 'bg-white/20 text-white font-semibold shadow-md border-l-4 border-orange-400'
+                        : 'text-blue-200 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    <span className="text-base">{item.icon}</span>
+                    <div>
+                      <p className="text-xs font-semibold leading-tight">{item.label}</p>
+                      <p className="text-[9px] opacity-75 leading-tight mt-0.5">{item.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
             ))}
           </nav>
         </div>
@@ -122,7 +147,7 @@ export default function Dashboard({ user, onLogout }: Props) {
               <span className="text-xl">☰</span>
             </button>
             <h1 className="text-lg font-semibold text-gray-800">
-              {menuItems.find(m => m.id === currentPage)?.label || 'Dashboard'}
+              {menuGroups.flatMap(g => g.items).find(m => m.id === currentPage)?.label || 'Dashboard Overview'}
             </h1>
           </div>
           <div className="flex items-center gap-3">

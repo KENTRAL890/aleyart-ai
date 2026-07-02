@@ -29,20 +29,30 @@ body {
   padding: 0;
 }
 
-/* Print styles for A4 */
+/* Print styles for A4 — removes browser URL, title, date, timestamps */
 @media print {
   @page {
-    size: A4;
-    margin: 15mm 15mm 15mm 15mm;
+    size: A4 portrait;
+    margin: 12mm 15mm;
   }
   
-  body {
-    background: white !important;
+  html {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  
-  .no-print {
+
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide everything that should not print */
+  .no-print,
+  header,
+  aside,
+  nav,
+  footer {
     display: none !important;
   }
   
@@ -50,6 +60,7 @@ body {
     display: block !important;
   }
   
+  /* Remove all shadows, borders, backgrounds from exam paper wrapper */
   .exam-paper {
     width: 100% !important;
     max-width: 100% !important;
@@ -57,8 +68,11 @@ body {
     margin: 0 !important;
     box-shadow: none !important;
     border: none !important;
+    border-radius: 0 !important;
+    background: white !important;
   }
 
+  /* Clean two-column layout for objectives */
   .two-column-layout {
     column-count: 2 !important;
     column-gap: 20px !important;
@@ -69,6 +83,19 @@ body {
     border-bottom: 1px solid #333;
     min-height: 25px;
     margin: 4px 0;
+  }
+
+  /* Hide the main layout wrapper padding */
+  main {
+    padding: 0 !important;
+  }
+  main > div {
+    padding: 0 !important;
+  }
+
+  /* Ensure page breaks work */
+  .page-break-before {
+    page-break-before: always;
   }
 }
 
@@ -120,6 +147,22 @@ body {
   justify-content: center;
   margin: 0 4px;
   font-size: 10px;
+}
+
+/* BECE Shading Style (Box Form) */
+.omr-box {
+  width: 32px;
+  height: 18px;
+  border: 1.5px solid #000;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 3px;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: monospace;
+  background: white;
 }
 
 /* Scrollbar */

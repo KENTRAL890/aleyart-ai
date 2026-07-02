@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import type { User, ClassLevel, Subject, ExamType, ExamPaper } from '../types';
-import { CLASS_LEVELS, SUBJECTS_BY_LEVEL, EXAM_TYPES, SPECIAL_EXAM_TYPES, TOPICS_BY_SUBJECT_LEVEL, EARLY_CHILDHOOD_LEVELS } from '../data/constants';
+import type { User, ClassLevel, Subject, ExamType, ExamPaper, DifficultyLevel } from '../types';
+import { CLASS_LEVELS, SUBJECTS_BY_LEVEL, EXAM_TYPES, SPECIAL_EXAM_TYPES, TOPICS_BY_SUBJECT_LEVEL, EARLY_CHILDHOOD_LEVELS, BEACON_OF_LIGHT_EXCERPTS, MATH_SHAPE_OPTIONS, getTopicsForTerm, NACCA_DIAGRAMS } from '../data/constants';
 import { generateExamPaper } from '../data/questionGenerator';
 import { saveExam } from '../store';
 import ExamPreview from './ExamPreview';
 import MarkingSchemeView from './MarkingSchemeView';
+import CustomShapeBuilderModal, { CustomShapeResult } from './CustomShapeBuilderModal';
+import { printElementsClean } from '../utils/printDocument';
 
 interface Props {
   user: User;
@@ -30,7 +32,29 @@ export default function ExamGenerator({ user, specialMode }: Props) {
   const [duration, setDuration] = useState('1 hour 30 minutes');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [additionalTopics, setAdditionalTopics] = useState('');
+  const [difficulty, setDifficulty] = useState<DifficultyLevel>('Medium');
   
+  // Custom Questions & Literature
+  const [customObjectives, setCustomObjectives] = useState<{ question: string; options: string[]; correctAnswer: string; imageUrl?: string }[]>([]);
+  const [customSubjectives, setCustomSubjectives] = useState<{ question: string; answer: string; marks: number; imageUrl?: string; subQuestions?: { label: string; question: string; answer: string; marks: number }[] }[]>([]);
+  const [newObjQ, setNewObjQ] = useState('');
+  const [newObjOpts, setNewObjOpts] = useState(['', '', '', '']);
+  const [newObjAns, setNewObjAns] = useState('');
+  const [newObjImg, setNewObjImg] = useState('');
+  
+  const [newSubjQ, setNewSubjQ] = useState('');
+  const [newSubjAns, setNewSubjAns] = useState('');
+  const [newSubjMarks, setNewSubjMarks] = useState(10);
+  const [newSubjImg, setNewSubjImg] = useState('');
+  const [showShapeModal, setShowShapeModal] = useState(false);
+
+  // Literature selection for English Basic 7-9
+  const [selectedLitIndex, setSelectedLitIndex] = useState<number | 'custom'>(-1);
+  const [customLitTitle, setCustomLitTitle] = useState('');
+  const [customLitExcerpt, setCustomLitExcerpt] = useState('');
+  const [customLitQ1, setCustomLitQ1] = useState({ q: '', answer: '' });
+  const [customLitQ2, setCustomLitQ2] = useState({ q: '', answer: '' });
+
   // Section A - Objective
   const [objectiveCount, setObjectiveCount] = useState(40);
   const [objectiveMarksPerQ, setObjectiveMarksPerQ] = useState(1);
@@ -50,7 +74,8 @@ export default function ExamGenerator({ user, specialMode }: Props) {
     : CLASS_LEVELS.filter(l => !EARLY_CHILDHOOD_LEVELS.includes(l));
 
   const availableSubjects = classLevel ? (SUBJECTS_BY_LEVEL[classLevel] || []) : [];
-  const availableTopics = (classLevel && subject) ? (TOPICS_BY_SUBJECT_LEVEL[subject as string]?.[classLevel] || []) : [];
+  const rawTopics = (classLevel && subject) ? (TOPICS_BY_SUBJECT_LEVEL[subject as string]?.[classLevel] || []) : [];
+  const availableTopics = getTopicsForTerm(rawTopics, term);
 
   const objectiveTotalMarks = objectiveCount * objectiveMarksPerQ;
   const subjectiveTotalMarks = subjectiveSections.reduce((sum, s) => sum + s.totalMarks, 0);
@@ -112,10 +137,27 @@ export default function ExamGenerator({ user, specialMode }: Props) {
     const totalSubjCount = subjectiveSections.reduce((sum, s) => sum + s.questionCount, 0);
     const totalSubjMarks = subjectiveSections.reduce((sum, s) => sum + s.totalMarks, 0);
 
+    let litExcerptObj;
+    if (subject === 'English Language' && ['Basic 7', 'Basic 8', 'Basic 9'].includes(classLevel as string)) {
+      if (selectedLitIndex === 'custom' && customLitExcerpt) {
+        litExcerptObj = {
+          title: customLitTitle || 'Custom Literature Passage',
+          excerpt: customLitExcerpt,
+          questions: [
+            { q: customLitQ1.q || 'What is the central message of this passage?', answer: customLitQ1.answer || 'Accept valid explanation.' },
+            { q: customLitQ2.q || 'Identify a figure of speech or key element in the text.', answer: customLitQ2.answer || 'Accept valid literary device identification.' }
+          ]
+        };
+      } else if (typeof selectedLitIndex === 'number' && selectedLitIndex >= 0 && BEACON_OF_LIGHT_EXCERPTS[selectedLitIndex]) {
+        litExcerptObj = BEACON_OF_LIGHT_EXCERPTS[selectedLitIndex];
+      }
+    }
+
     const exam = generateExamPaper({
       classLevel: classLevel as ClassLevel,
       subject: subject as Subject,
       examType: finalExamType,
+      difficulty,
       term,
       academicYear,
       duration,
@@ -127,6 +169,9 @@ export default function ExamGenerator({ user, specialMode }: Props) {
       subjectiveMarks: totalSubjMarks,
       subjectiveSections: subjectiveSections.map(s => s.title),
       subjectiveInstructions,
+      customObjectives,
+      customSubjectives,
+      literatureExcerpt: litExcerptObj,
       createdBy: user.name,
     });
 
@@ -168,7 +213,7 @@ export default function ExamGenerator({ user, specialMode }: Props) {
           <button onClick={handleSaveExam} disabled={saving} className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition">
             {saving ? '⏳ Saving...' : '💾 Save Exam'}
           </button>
-          <button onClick={() => window.print()} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">
+          <button onClick={() => printElementsClean('.exam-paper')} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">
             🖨️ Print Exam
           </button>
           <button onClick={() => setShowMarkingScheme(!showMarkingScheme)} className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition">
@@ -370,6 +415,104 @@ export default function ExamGenerator({ user, specialMode }: Props) {
           <div className="space-y-5">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">⚙️ Exam Settings</h3>
 
+            {/* Difficulty Level Selector */}
+            <div className="bg-yellow-50 rounded-xl p-5 border border-yellow-200">
+              <h4 className="font-semibold text-yellow-800 mb-3 flex items-center gap-2">
+                <span>🎯</span> Choose Examination Difficulty Level
+              </h4>
+              <div className="grid grid-cols-3 gap-3">
+                {(['Easy', 'Medium', 'Hard'] as DifficultyLevel[]).map(lvl => (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => setDifficulty(lvl)}
+                    className={`py-3 px-4 rounded-xl font-bold border transition ${
+                      difficulty === lvl
+                        ? 'bg-yellow-500 text-white border-yellow-600 shadow-md scale-[1.02]'
+                        : 'bg-white text-gray-700 border-gray-200 hover:border-yellow-400'
+                    }`}
+                  >
+                    {lvl === 'Easy' ? '🟢 Easy' : lvl === 'Medium' ? '🟡 Medium' : '🔴 Hard'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Literature Selection for English Basic 7-9 */}
+            {subject === 'English Language' && ['Basic 7', 'Basic 8', 'Basic 9'].includes(classLevel as string) && (
+              <div className="bg-purple-50 rounded-xl p-5 border border-purple-200">
+                <h4 className="font-semibold text-purple-800 mb-3 flex items-center gap-2">
+                  <span>📚</span> Select Literature Story / Chapter ("The Beacon of Light")
+                </h4>
+                <div className="space-y-3">
+                  <select
+                    value={selectedLitIndex}
+                    onChange={e => setSelectedLitIndex(e.target.value === 'custom' ? 'custom' : parseInt(e.target.value))}
+                    className="w-full px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white font-medium"
+                  >
+                    <option value={-1}>Default / Auto-select from Question Bank</option>
+                    {BEACON_OF_LIGHT_EXCERPTS.map((ex, idx) => (
+                      <option key={idx} value={idx}>{ex.title}</option>
+                    ))}
+                    <option value="custom">✏️ Enter Custom Story Excerpt & Questions...</option>
+                  </select>
+
+                  {selectedLitIndex === 'custom' && (
+                    <div className="bg-white p-4 rounded-xl border border-purple-200 space-y-3">
+                      <input
+                        type="text"
+                        value={customLitTitle}
+                        onChange={e => setCustomLitTitle(e.target.value)}
+                        placeholder="Chapter Title e.g., Chapter 4: The Village Lighthouse"
+                        className="w-full px-3 py-2 border rounded-lg text-sm"
+                      />
+                      <textarea
+                        value={customLitExcerpt}
+                        onChange={e => setCustomLitExcerpt(e.target.value)}
+                        placeholder="Enter the reading passage / excerpt here..."
+                        rows={4}
+                        className="w-full px-3 py-2 border rounded-lg text-sm"
+                      />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <input
+                            type="text"
+                            value={customLitQ1.q}
+                            onChange={e => setCustomLitQ1({ ...customLitQ1, q: e.target.value })}
+                            placeholder="Question 1 (a)"
+                            className="w-full px-2 py-1 border rounded text-xs mb-1"
+                          />
+                          <input
+                            type="text"
+                            value={customLitQ1.answer}
+                            onChange={e => setCustomLitQ1({ ...customLitQ1, answer: e.target.value })}
+                            placeholder="Exact Answer 1 (a)"
+                            className="w-full px-2 py-1 border rounded text-xs text-green-700 font-medium"
+                          />
+                        </div>
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <input
+                            type="text"
+                            value={customLitQ2.q}
+                            onChange={e => setCustomLitQ2({ ...customLitQ2, q: e.target.value })}
+                            placeholder="Question 2 (b)"
+                            className="w-full px-2 py-1 border rounded text-xs mb-1"
+                          />
+                          <input
+                            type="text"
+                            value={customLitQ2.answer}
+                            onChange={e => setCustomLitQ2({ ...customLitQ2, answer: e.target.value })}
+                            placeholder="Exact Answer 2 (b)"
+                            className="w-full px-2 py-1 border rounded text-xs text-green-700 font-medium"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Section A - Objective */}
             <div className="bg-blue-50 rounded-xl p-5 border border-blue-100">
               <h4 className="font-semibold text-blue-800 mb-3">📝 Section A - Objective Questions</h4>
@@ -398,6 +541,94 @@ export default function ExamGenerator({ user, specialMode }: Props) {
                   <label className="block text-sm font-medium text-gray-600 mb-2">Total Marks</label>
                   <div className="px-4 py-3 bg-blue-100 rounded-xl font-semibold text-blue-800">
                     {objectiveTotalMarks} marks
+                  </div>
+                </div>
+              </div>
+
+              {/* Custom Objective Questions Adder */}
+              <div className="mt-4 pt-4 border-t border-blue-200">
+                <h5 className="text-xs font-bold text-blue-900 mb-2 uppercase tracking-wide">➕ Insert Custom Objective Question / Shape Diagram (Optional)</h5>
+                {customObjectives.length > 0 && (
+                  <div className="mb-3 space-y-1">
+                    {customObjectives.map((co, idx) => (
+                      <div key={idx} className="flex items-center justify-between bg-white p-2 rounded border border-blue-200 text-xs">
+                        <span className="font-medium truncate max-w-md">Q{idx+1}: {co.question}</span>
+                        <button type="button" onClick={() => setCustomObjectives(customObjectives.filter((_, i) => i !== idx))} className="text-red-500 font-bold ml-2">✕ Remove</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="bg-white p-3 rounded-xl border border-blue-200 space-y-2 text-xs">
+                  <input
+                    type="text"
+                    value={newObjQ}
+                    onChange={e => setNewObjQ(e.target.value)}
+                    placeholder="Enter custom multiple choice question..."
+                    className="w-full px-3 py-1.5 border rounded-lg"
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    {newObjOpts.map((opt, idx) => (
+                      <input
+                        key={idx}
+                        type="text"
+                        value={opt}
+                        onChange={e => {
+                          const u = [...newObjOpts];
+                          u[idx] = e.target.value;
+                          setNewObjOpts(u);
+                        }}
+                        placeholder={`Option ${String.fromCharCode(65 + idx)}`}
+                        className="px-2 py-1 border rounded"
+                      />
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <input
+                      type="text"
+                      value={newObjAns}
+                      onChange={e => setNewObjAns(e.target.value)}
+                      placeholder="Correct Answer (e.g. Option A text)"
+                      className="flex-1 px-2 py-1 border rounded text-green-700 font-medium"
+                    />
+                    <input
+                      type="text"
+                      value={newObjImg}
+                      onChange={e => setNewObjImg(e.target.value)}
+                      placeholder="Paste Webpage Image Link / URL..."
+                      className="w-48 px-2 py-1 border rounded text-xs"
+                    />
+                    <select
+                      onChange={e => setNewObjImg(e.target.value)}
+                      className="px-2 py-1 border rounded bg-gray-50 text-xs"
+                    >
+                      <option value="">Pick Prebuilt Diagram...</option>
+                      <optgroup label="Mathematics Shapes">
+                        {MATH_SHAPE_OPTIONS.map((shape, i) => (
+                          <option key={i} value={shape.url}>📐 {shape.label}</option>
+                        ))}
+                      </optgroup>
+                      {Object.entries(NACCA_DIAGRAMS).map(([subj, list]) => (
+                        <optgroup key={subj} label={`NaCCA ${subj}`}>
+                          {(list as {label:string;url:string}[]).map((item, i) => (
+                            <option key={i} value={item.url}>📌 {item.label}</option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!newObjQ) return;
+                        setCustomObjectives([...customObjectives, { question: newObjQ, options: newObjOpts, correctAnswer: newObjAns || newObjOpts[0], imageUrl: newObjImg || undefined }]);
+                        setNewObjQ('');
+                        setNewObjOpts(['', '', '', '']);
+                        setNewObjAns('');
+                        setNewObjImg('');
+                      }}
+                      className="px-3 py-1 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700"
+                    >
+                      + Add Question
+                    </button>
                   </div>
                 </div>
               </div>
@@ -486,6 +717,94 @@ export default function ExamGenerator({ user, specialMode }: Props) {
                 <span className="text-sm text-green-700">Total Subjective Marks: </span>
                 <span className="font-bold text-green-800">{subjectiveTotalMarks}</span>
               </div>
+
+              {/* Custom Subjective Questions Adder */}
+              <div className="mt-4 pt-4 border-t border-green-200">
+                <h5 className="text-xs font-bold text-green-900 mb-2 uppercase tracking-wide">➕ Insert Custom Subjective Question / Shape Diagram (Optional)</h5>
+                {customSubjectives.length > 0 && (
+                  <div className="mb-3 space-y-1">
+                    {customSubjectives.map((cs, idx) => (
+                      <div key={idx} className="flex items-center justify-between bg-white p-2 rounded border border-green-200 text-xs">
+                        <span className="font-medium truncate max-w-md">Q{idx+1}: {cs.question} [{cs.marks}m]</span>
+                        <button type="button" onClick={() => setCustomSubjectives(customSubjectives.filter((_, i) => i !== idx))} className="text-red-500 font-bold ml-2">✕ Remove</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="bg-white p-3 rounded-xl border border-green-200 space-y-2 text-xs">
+                  <textarea
+                    value={newSubjQ}
+                    onChange={e => setNewSubjQ(e.target.value)}
+                    placeholder="Enter custom subjective/essay/theory question..."
+                    rows={2}
+                    className="w-full px-3 py-1.5 border rounded-lg"
+                  />
+                  <textarea
+                    value={newSubjAns}
+                    onChange={e => setNewSubjAns(e.target.value)}
+                    placeholder="Exact Correct Answer & Working for Marking Scheme..."
+                    rows={2}
+                    className="w-full px-3 py-1.5 border rounded-lg text-green-700 font-medium"
+                  />
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <div className="flex items-center gap-1">
+                      <span>Marks:</span>
+                      <input
+                        type="number"
+                        value={newSubjMarks}
+                        onChange={e => setNewSubjMarks(parseInt(e.target.value) || 10)}
+                        className="w-16 px-2 py-1 border rounded"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={newSubjImg}
+                      onChange={e => setNewSubjImg(e.target.value)}
+                      placeholder="Paste Webpage Diagram URL..."
+                      className="w-44 px-2 py-1 border rounded text-xs"
+                    />
+                    <select
+                      onChange={e => setNewSubjImg(e.target.value)}
+                      className="px-2 py-1 border rounded bg-gray-50 text-xs"
+                    >
+                      <option value="">Pick Prebuilt Diagram...</option>
+                      <optgroup label="Mathematics Shapes">
+                        {MATH_SHAPE_OPTIONS.map((shape, i) => (
+                          <option key={i} value={shape.url}>📐 {shape.label}</option>
+                        ))}
+                      </optgroup>
+                      {Object.entries(NACCA_DIAGRAMS).map(([subj, list]) => (
+                        <optgroup key={subj} label={`NaCCA ${subj}`}>
+                          {(list as {label:string;url:string}[]).map((item, i) => (
+                            <option key={i} value={item.url}>📌 {item.label}</option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => setShowShapeModal(true)}
+                      className="px-3 py-1 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 text-xs"
+                    >
+                      📐 Launch Custom Shape Builder...
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!newSubjQ) return;
+                        setCustomSubjectives([...customSubjectives, { question: newSubjQ, answer: newSubjAns || 'Accept valid answer.', marks: newSubjMarks, imageUrl: newSubjImg || undefined }]);
+                        setNewSubjQ('');
+                        setNewSubjAns('');
+                        setNewSubjMarks(10);
+                        setNewSubjImg('');
+                      }}
+                      className="ml-auto px-3 py-1 bg-green-600 text-white font-semibold rounded hover:bg-green-700"
+                    >
+                      + Add Subjective Question
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Section Instructions */}
@@ -555,6 +874,22 @@ export default function ExamGenerator({ user, specialMode }: Props) {
           </div>
         )}
       </div>
+
+      {showShapeModal && (
+        <CustomShapeBuilderModal
+          onClose={() => setShowShapeModal(false)}
+          onInsert={(res: CustomShapeResult) => {
+            setCustomSubjectives([...customSubjectives, {
+              question: res.suggestedQuestion,
+              answer: res.suggestedAnswer,
+              marks: res.suggestedMarks,
+              imageUrl: res.svgDataUrl,
+              subQuestions: res.subQuestions
+            }]);
+            setShowShapeModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }

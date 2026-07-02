@@ -300,3 +300,95 @@ export const KG_ASSESSMENT_AREAS = {
     }
   ]
 };
+
+export const MATH_SHAPE_OPTIONS = [
+  { label: 'Right-Angled Triangle (Base 4cm, Height 3cm)', url: '/images/math-triangle.jpg' },
+  { label: 'Circle (Radius r = 7cm)', url: '/images/math-circle.jpg' },
+  { label: 'Cylinder (Radius r = 5cm, Height 10cm)', url: '/images/math-cylinder.jpg' },
+  { label: 'Rectangle (Length 8cm, Width 5cm)', url: '/images/math-rectangle.jpg' },
+  { label: 'Acute Angle (Theta = 60°)', url: '/images/math-angle.jpg' },
+];
+
+export const BEACON_OF_LIGHT_EXCERPTS = [
+  {
+    title: 'Chapter 1: The Storm at Sea',
+    excerpt: 'The dark clouds gathered over the coastal town of Anomabo as young Kwame stared out into the turbulent waves. His father had set sail before dawn, seeking the daily catch that sustained their family. Kwame knew the sea was both a generous provider and a fierce master. As the wind howled through the palm fronds, he remembered his father\'s advice: "A beacon of light guides the steady sailor through the darkest night."',
+    questions: [
+      { q: 'Where does the story take place?', answer: 'The story takes place in the coastal town of Anomabo.' },
+      { q: 'Why did Kwame\'s father set sail before dawn?', answer: 'He set sail seeking the daily catch to sustain their family.' },
+      { q: 'What advice did Kwame\'s father give him?', answer: 'He advised that "A beacon of light guides the steady sailor through the darkest night."' },
+    ]
+  },
+  {
+    title: 'Chapter 2: The Quest for Knowledge',
+    excerpt: 'Despite the financial struggles following the storm, Kwame never gave up his dream of attending the academy. Every evening, by the flickering light of an oil lamp, he devoured old textbooks borrowed from the village teacher, Mr. Ansah. Kwame realized that education was the true lighthouse that would dispel the fog of ignorance and poverty.',
+    questions: [
+      { q: 'How did Kwame study every evening?', answer: 'He studied by the flickering light of an oil lamp using textbooks borrowed from Mr. Ansah.' },
+      { q: 'What metaphor is used to describe education in the passage?', answer: 'Education is described as "the true lighthouse that would dispel the fog of ignorance and poverty."' },
+    ]
+  },
+  {
+    title: 'Chapter 3: The Beacon of Hope',
+    excerpt: 'On the day of the national examination, Kwame walked into the examination hall with steady confidence. When the results were announced weeks later, his name stood at the very top of the regional list. The entire community gathered to celebrate, recognizing that Kwame had become their very own beacon of light.',
+    questions: [
+      { q: 'What happened when the national examination results were announced?', answer: 'Kwame\'s name stood at the very top of the regional list.' },
+      { q: 'Why did the community gather to celebrate?', answer: 'They gathered to celebrate because Kwame had succeeded and become their beacon of light.' },
+    ]
+  }
+];
+
+// Universal NaCCA Diagram Library — available across ALL classes and subjects
+export const NACCA_DIAGRAMS: Record<string, { label: string; url: string; topic: string }[]> = {
+  'Mathematics': [
+    { label: 'Right-Angled Triangle', url: '/images/math-triangle.jpg', topic: 'Geometry' },
+    { label: 'Circle with Radius', url: '/images/math-circle.jpg', topic: 'Measurement' },
+    { label: 'Cylinder', url: '/images/math-cylinder.jpg', topic: 'Mensuration' },
+    { label: 'Rectangle', url: '/images/math-rectangle.jpg', topic: 'Shapes & Space' },
+    { label: 'Angle Diagram', url: '/images/math-angle.jpg', topic: 'Angles & Bearings' },
+  ],
+  'Computing': [
+    { label: 'Algorithm Flowchart', url: '/images/computing-flowchart-1.jpg', topic: 'Algorithms & Flowcharts' },
+    { label: 'Computer Block Diagram (Input→CPU→Output)', url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><rect x="10" y="70" width="70" height="40" fill="#e2e8f0" stroke="#0f172a" stroke-width="2"/><text x="45" y="94" font-size="12" font-weight="bold" text-anchor="middle">INPUT</text><rect x="120" y="40" width="90" height="100" fill="#bfdbfe" stroke="#1d4ed8" stroke-width="2"/><text x="165" y="75" font-size="13" font-weight="bold" text-anchor="middle">CPU</text><text x="165" y="115" font-size="11" text-anchor="middle">Memory</text><rect x="240" y="70" width="70" height="40" fill="#e2e8f0" stroke="#0f172a" stroke-width="2"/><text x="275" y="94" font-size="12" font-weight="bold" text-anchor="middle">OUTPUT</text><line x1="80" y1="90" x2="120" y2="90" stroke="#0f172a" stroke-width="2"/><line x1="210" y1="90" x2="240" y2="90" stroke="#0f172a" stroke-width="2"/></svg>'), topic: 'Computer Hardware' },
+    { label: 'Star Network Topology', url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 220"><circle cx="140" cy="110" r="20" fill="#bfdbfe" stroke="#1d4ed8" stroke-width="2"/><text x="140" y="115" font-size="10" font-weight="bold" text-anchor="middle">HUB</text><circle cx="60" cy="40" r="14" fill="#e2e8f0" stroke="#334155" stroke-width="2"/><text x="60" y="44" font-size="8" text-anchor="middle">PC1</text><circle cx="220" cy="40" r="14" fill="#e2e8f0" stroke="#334155" stroke-width="2"/><text x="220" y="44" font-size="8" text-anchor="middle">PC2</text><circle cx="60" cy="180" r="14" fill="#e2e8f0" stroke="#334155" stroke-width="2"/><text x="60" y="184" font-size="8" text-anchor="middle">PC3</text><circle cx="220" cy="180" r="14" fill="#e2e8f0" stroke="#334155" stroke-width="2"/><text x="220" y="184" font-size="8" text-anchor="middle">PC4</text><line x1="140" y1="90" x2="60" y2="54" stroke="#334155" stroke-width="1.5"/><line x1="140" y1="90" x2="220" y2="54" stroke="#334155" stroke-width="1.5"/><line x1="140" y1="130" x2="60" y2="166" stroke="#334155" stroke-width="1.5"/><line x1="140" y1="130" x2="220" y2="166" stroke="#334155" stroke-width="1.5"/></svg>'), topic: 'Networking' },
+  ],
+  'Science': [
+    { label: 'Laboratory Experiment Setup', url: '/images/science-practical-1.jpg', topic: 'Practical Investigations' },
+    { label: 'Filtration Apparatus', url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220"><polygon points="110,60 190,60 150,130" fill="none" stroke="#0f172a" stroke-width="2"/><rect x="130" y="130" width="40" height="70" fill="none" stroke="#0f172a" stroke-width="2"/><line x1="130" y1="170" x2="170" y2="170" stroke="#3b82f6" stroke-width="2" stroke-dasharray="3,3"/><text x="200" y="80" font-size="12" font-weight="bold">Filter Funnel</text><text x="180" y="160" font-size="12" font-weight="bold">Filtrate</text></svg>'), topic: 'Diversity of Matter' },
+    { label: 'Simple Plant Cell', url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 200"><rect x="30" y="20" width="220" height="160" rx="30" fill="#dcfce7" stroke="#166534" stroke-width="3"/><ellipse cx="140" cy="100" rx="50" ry="35" fill="#bbf7d0" stroke="#166534" stroke-width="2"/><text x="140" y="105" font-size="11" text-anchor="middle" font-weight="bold">Nucleus</text><text x="140" y="22" font-size="10" text-anchor="middle" fill="#166534">Cell Wall</text><text x="140" y="185" font-size="10" text-anchor="middle" fill="#166534">Cytoplasm</text></svg>'), topic: 'Living Things / Cells' },
+  ],
+  'Career Technology': [
+    { label: 'Orthographic Technical Drawing', url: '/images/career-tech-design-1.jpg', topic: 'Technical Drawing' },
+    { label: 'Woodwork Joint (Mortise & Tenon)', url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect x="50" y="80" width="120" height="40" fill="#fef3c7" stroke="#854d0e" stroke-width="2"/><rect x="170" y="90" width="30" height="20" fill="#fde047" stroke="#854d0e" stroke-width="2"/><rect x="210" y="40" width="40" height="120" fill="#fef3c7" stroke="#854d0e" stroke-width="2"/><rect x="210" y="90" width="40" height="20" fill="none" stroke="#854d0e" stroke-width="2" stroke-dasharray="4,4"/><text x="110" y="70" font-size="12" font-weight="bold">Tenon</text><text x="230" y="30" font-size="12" font-weight="bold">Mortise</text></svg>'), topic: 'Materials & Tools' },
+  ],
+  'Creative Arts': [
+    { label: 'Adinkra Symbol — Gye Nyame (Except God)', url: '/images/creative-arts-adinkra-1.jpg', topic: 'Ghanaian Cultural Heritage' },
+    { label: 'Primary & Secondary Colour Wheel', url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><circle cx="120" cy="120" r="90" fill="none" stroke="#000" stroke-width="2"/><path d="M120 120L120 30A90 90 0 0 1 198 75Z" fill="#ef4444"/><path d="M120 120L198 75A90 90 0 0 1 198 165Z" fill="#f97316"/><path d="M120 120L198 165A90 90 0 0 1 120 210Z" fill="#eab308"/><path d="M120 120L120 210A90 90 0 0 1 42 165Z" fill="#22c55e"/><path d="M120 120L42 165A90 90 0 0 1 42 75Z" fill="#3b82f6"/><path d="M120 120L42 75A90 90 0 0 1 120 30Z" fill="#a855f7"/></svg>'), topic: 'Colour Theory (All Levels)' },
+    { label: 'Kente Weaving Pattern', url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160"><rect x="0" y="0" width="240" height="160" fill="#fef3c7"/><rect x="10" y="10" width="30" height="140" fill="#eab308" stroke="#854d0e" stroke-width="1"/><rect x="50" y="10" width="30" height="140" fill="#22c55e" stroke="#166534" stroke-width="1"/><rect x="90" y="10" width="30" height="140" fill="#ef4444" stroke="#991b1b" stroke-width="1"/><rect x="130" y="10" width="30" height="140" fill="#3b82f6" stroke="#1e40af" stroke-width="1"/><rect x="170" y="10" width="30" height="140" fill="#eab308" stroke="#854d0e" stroke-width="1"/><rect x="10" y="30" width="190" height="15" fill="rgba(0,0,0,0.1)"/><rect x="10" y="70" width="190" height="15" fill="rgba(0,0,0,0.1)"/><rect x="10" y="110" width="190" height="15" fill="rgba(0,0,0,0.1)"/><text x="210" y="85" font-size="11" font-weight="bold" fill="#854d0e">Kente</text></svg>'), topic: 'Textiles & Weaving (All Levels)' },
+    { label: 'Elements of Design (Line, Shape, Colour)', url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160"><line x1="20" y1="80" x2="90" y2="80" stroke="#1e293b" stroke-width="3"/><text x="55" y="100" font-size="10" text-anchor="middle" font-weight="bold">LINE</text><rect x="110" y="55" width="50" height="50" fill="#3b82f6" stroke="#1e293b" stroke-width="2"/><text x="135" y="125" font-size="10" text-anchor="middle" font-weight="bold">SHAPE</text><circle cx="230" cy="80" r="25" fill="#ef4444" stroke="#1e293b" stroke-width="2"/><text x="230" y="125" font-size="10" text-anchor="middle" font-weight="bold">COLOUR</text></svg>'), topic: 'Design Elements (All Levels)' },
+  ],
+  'Social Studies': [
+    { label: 'Map of Ghana (Regions)', url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260"><rect x="10" y="10" width="180" height="240" fill="#f0fdf4" stroke="#166534" stroke-width="2" rx="10"/><text x="100" y="40" font-size="16" font-weight="bold" text-anchor="middle" fill="#166534">GHANA</text><text x="100" y="65" font-size="10" text-anchor="middle" fill="#166534">16 Regions</text><line x1="30" y1="80" x2="170" y2="80" stroke="#86efac" stroke-width="1"/><text x="100" y="100" font-size="9" text-anchor="middle">Greater Accra</text><text x="100" y="120" font-size="9" text-anchor="middle">Ashanti Region</text><text x="100" y="140" font-size="9" text-anchor="middle">Northern Region</text><text x="100" y="160" font-size="9" text-anchor="middle">Western Region</text><text x="100" y="180" font-size="9" text-anchor="middle">Eastern Region</text><text x="100" y="200" font-size="9" text-anchor="middle">Volta Region</text><text x="100" y="220" font-size="9" text-anchor="middle" fill="#64748b">...and more</text></svg>'), topic: 'Our Environment / Maps' },
+  ],
+  'RME': [
+    { label: 'Religious Symbols (Cross, Crescent, Star)', url: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120"><line x1="50" y1="10" x2="50" y2="100" stroke="#854d0e" stroke-width="4"/><line x1="25" y1="35" x2="75" y2="35" stroke="#854d0e" stroke-width="4"/><text x="50" y="115" font-size="9" text-anchor="middle" font-weight="bold">Christianity</text><path d="M140 20 A30 30 0 0 1 140 80" fill="none" stroke="#166534" stroke-width="3"/><circle cx="165" cy="35" r="5" fill="#166534"/><text x="150" y="115" font-size="9" text-anchor="middle" font-weight="bold">Islam</text><polygon points="250,15 257,40 280,40 262,55 268,80 250,65 232,80 238,55 220,40 243,40" fill="#eab308" stroke="#854d0e" stroke-width="1.5"/><text x="250" y="115" font-size="9" text-anchor="middle" font-weight="bold">Judaism</text></svg>'), topic: 'Religious Teachings' },
+  ],
+};
+
+/**
+ * Filter topics based on selected Term (Term 1, Term 2, Term 3).
+ * By NaCCA guidelines, Term 3 covers cumulative mixture of Term 1, 2, and 3 topics.
+ */
+export function getTopicsForTerm(allTopics: string[], term: string): string[] {
+  if (!allTopics || allTopics.length === 0) return [];
+  if (term === 'Term 3') {
+    return allTopics; // Mixture of all terms 1, 2, and 3
+  }
+  const mid = Math.ceil(allTopics.length / 2);
+  if (term === 'Term 1') {
+    return allTopics.slice(0, mid);
+  }
+  if (term === 'Term 2') {
+    return allTopics.slice(mid);
+  }
+  return allTopics;
+}

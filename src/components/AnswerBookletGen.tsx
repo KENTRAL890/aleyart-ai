@@ -25,59 +25,89 @@ export default function AnswerBookletGen() {
           <button onClick={() => setGenerated(false)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition">
             ← Back
           </button>
-          <button onClick={() => window.print()} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">
+          <button onClick={() => { document.title = ' '; window.print(); }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">
             🖨️ Print Answer Booklet
           </button>
         </div>
 
-        {/* Answer Booklet Pages */}
+        {/* Answer Booklet Pages — BECE Style A4 */}
         {Array.from({ length: pageCount }).map((_, pageIdx) => (
-          <div key={pageIdx} className="exam-paper mb-4" style={{ fontFamily: 'serif' }}>
-            {pageIdx === 0 && (
-              <div className="text-center border-b-2 border-black pb-4 mb-6">
-                <h1 className="text-xl font-bold uppercase">ALEYART ACADEMY</h1>
-                <h2 className="text-base font-semibold mt-1">ANSWER BOOKLET</h2>
-                <div className="mt-3 text-sm">
-                  <div className="grid grid-cols-2 gap-2 text-left">
-                    <p><strong>Subject:</strong> {subject}</p>
-                    <p><strong>Class:</strong> {classLevel}</p>
-                    <p><strong>Exam:</strong> {examType}</p>
-                    <p><strong>Date:</strong> _______________</p>
+          <div key={pageIdx} style={{
+            width: '210mm', minHeight: '297mm', padding: '12mm 15mm',
+            background: 'white', margin: '0 auto 8px auto', boxSizing: 'border-box',
+            fontFamily: "'Times New Roman', Times, serif", fontSize: '12px',
+            boxShadow: '0 0 10px rgba(0,0,0,0.08)', position: 'relative',
+            pageBreakAfter: 'always',
+          }}>
+            {pageIdx === 0 ? (
+              <>
+                {/* Cover Page — BECE Style */}
+                <div style={{ border: '3px solid #000', padding: '20px', marginBottom: '15px' }}>
+                  <div style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '12px', marginBottom: '15px' }}>
+                    <p style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '2px', margin: '0 0 2px 0' }}>ALEYART ACADEMY</p>
+                    <p style={{ fontSize: '10px', fontStyle: 'italic', color: '#555', margin: '0 0 4px 0' }}>Motto: Seeking Wisdom</p>
+                    <p style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 2px 0' }}>ANSWER BOOKLET</p>
+                    <p style={{ fontSize: '10px', color: '#666', margin: 0 }}>Standard A4 (210 mm × 297 mm) — BECE Format</p>
                   </div>
-                  <div className="mt-3 text-left">
-                    <p><strong>Student Name:</strong> ________________________________________</p>
-                    <p className="mt-1"><strong>Index No:</strong> _________________</p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', fontSize: '12px', marginBottom: '12px' }}>
+                    <p style={{ margin: '4px 0' }}><strong>Subject:</strong> {subject}</p>
+                    <p style={{ margin: '4px 0' }}><strong>Class:</strong> {classLevel}</p>
+                    <p style={{ margin: '4px 0' }}><strong>Exam Type:</strong> {examType}</p>
+                    <p style={{ margin: '4px 0' }}><strong>Date:</strong> _______________________</p>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid #000', paddingTop: '10px', fontSize: '12px' }}>
+                    <p style={{ margin: '6px 0' }}><strong>Student Full Name:</strong> _____________________________________________</p>
+                    <p style={{ margin: '6px 0' }}><strong>Index Number:</strong> ______________________</p>
+                    <p style={{ margin: '6px 0' }}><strong>Signature:</strong> ___________________________</p>
                   </div>
                 </div>
-                <div className="mt-3 bg-gray-50 border border-gray-300 rounded-lg p-2 text-xs text-left">
-                  <p className="font-bold">INSTRUCTIONS:</p>
-                  <p>• Write your answers clearly in this booklet.</p>
-                  <p>• Start each new question on a fresh line.</p>
-                  <p>• Do not tear any pages from this booklet.</p>
+
+                {/* Instructions */}
+                <div style={{ border: '2px solid #000', padding: '8px 12px', marginBottom: '15px', fontSize: '11px' }}>
+                  <p style={{ fontWeight: 900, textDecoration: 'underline', marginBottom: '4px' }}>INSTRUCTIONS TO CANDIDATES:</p>
+                  <ul style={{ margin: 0, paddingLeft: '18px' }}>
+                    <li style={{ marginBottom: '2px' }}>Write your answers neatly and clearly in this booklet.</li>
+                    <li style={{ marginBottom: '2px' }}>Start each new question on a fresh line.</li>
+                    <li style={{ marginBottom: '2px' }}>Do NOT tear any pages from this booklet.</li>
+                    <li style={{ marginBottom: '2px' }}>Show all working clearly where required.</li>
+                    <li>This booklet contains {pageCount} pages. Check that all pages are present.</li>
+                  </ul>
                 </div>
-              </div>
-            )}
 
-            {pageIdx > 0 && (
-              <div className="text-right text-xs text-gray-400 mb-4 border-b border-gray-200 pb-2">
-                Page {pageIdx + 1} of {pageCount} | {subject} - {classLevel}
-              </div>
-            )}
+                {/* First page writing area */}
+                <div style={{
+                  marginLeft: hasMargin ? '45px' : '0',
+                  borderLeft: hasMargin ? '2px solid #dc2626' : 'none',
+                  paddingLeft: hasMargin ? '12px' : '0',
+                  minHeight: '300px',
+                }}>
+                  {hasLines && Array.from({ length: 16 }).map((_, lineIdx) => (
+                    <div key={lineIdx} style={{ borderBottom: '1px solid #93c5fd', height: '24px' }} />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Subsequent Pages — BECE Style */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '8px', color: '#555' }}>
+                  <span style={{ fontWeight: 700 }}>{subject} — {classLevel}</span>
+                  <span>Page {pageIdx + 1} of {pageCount}</span>
+                </div>
 
-            <div style={{
-              marginLeft: hasMargin ? '60px' : '0',
-              borderLeft: hasMargin ? '2px solid #e53e3e' : 'none',
-              paddingLeft: hasMargin ? '15px' : '0',
-              minHeight: pageIdx === 0 ? '350px' : '680px',
-            }}>
-              {hasLines && Array.from({ length: pageIdx === 0 ? 18 : 32 }).map((_, lineIdx) => (
-                <div
-                  key={lineIdx}
-                  className="border-b border-gray-300"
-                  style={{ height: '22px' }}
-                />
-              ))}
-            </div>
+                <div style={{
+                  marginLeft: hasMargin ? '45px' : '0',
+                  borderLeft: hasMargin ? '2px solid #dc2626' : 'none',
+                  paddingLeft: hasMargin ? '12px' : '0',
+                  minHeight: '700px',
+                }}>
+                  {hasLines && Array.from({ length: 30 }).map((_, lineIdx) => (
+                    <div key={lineIdx} style={{ borderBottom: '1px solid #93c5fd', height: '24px' }} />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>
@@ -87,7 +117,7 @@ export default function AnswerBookletGen() {
   return (
     <div className="max-w-xl mx-auto animate-fade-in">
       <div className="bg-white rounded-xl p-6 border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">📖 Generate Answer Booklet</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">📖 Generate BECE-Style Answer Booklet</h3>
 
         <div className="space-y-4">
           <div>
@@ -156,7 +186,7 @@ export default function AnswerBookletGen() {
             disabled={!classLevel || !subject}
             className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-xl font-medium transition"
           >
-            📖 Generate Booklet
+            📖 Generate BECE Answer Booklet
           </button>
         </div>
       </div>

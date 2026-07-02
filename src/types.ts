@@ -29,6 +29,8 @@ export type QuestionType =
   | 'Multiple Choice' | 'Short Answer' | 'Essay/Theory'
   | 'Fill in the Blank' | 'True or False' | 'Subjective';
 
+export type DifficultyLevel = 'Easy' | 'Medium' | 'Hard';
+
 export interface SubQuestion {
   id: string;
   label: string; // e.g., "1a", "1ai", "1b"
@@ -76,12 +78,33 @@ export interface EnglishSectionB {
   oralLanguage?: ExamSection;
 }
 
+export interface CustomObjectiveQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  imageUrl?: string;
+}
+
+export interface CustomSubjectiveQuestion {
+  question: string;
+  answer: string;
+  marks: number;
+  imageUrl?: string;
+  subQuestions?: {
+    label: string;
+    question: string;
+    answer: string;
+    marks: number;
+  }[];
+}
+
 export interface ExamPaper {
   id: string;
   schoolName: string;
   classLevel: ClassLevel;
   subject: Subject;
   examType: ExamType;
+  difficulty?: DifficultyLevel;
   term: string;
   academicYear: string;
   duration: string;
@@ -103,6 +126,7 @@ export interface MarkingSchemeItem {
   question: string;
   correctAnswer: string;
   marks: number;
+  imageUrl?: string;
   working?: string;
   explanation?: string;
   subAnswers?: {
